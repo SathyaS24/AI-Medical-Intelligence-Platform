@@ -6,7 +6,7 @@ WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
-RUN npm run build
+RUN npx vite build
 
 # ==========================================
 # Stage 2: Create the production FastAPI Backend
