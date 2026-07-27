@@ -36,14 +36,14 @@ class NumberedCanvas(canvas.Canvas):
         self.setFillColor(colors.HexColor("#64748b"))
         
         # Header
-        self.drawString(54, 750, "AI Medical Intelligence Platform — Technical Project Report")
+        self.drawString(54, 750, "MedTool AI — Technical Project Report")
         self.setStrokeColor(colors.HexColor("#cbd5e1"))
         self.setLineWidth(0.5)
         self.line(54, 742, 612 - 54, 742)
         
         # Footer
         self.line(54, 55, 612 - 54, 55)
-        self.drawString(54, 42, "CONFIDENTIAL — CLINICAL EVALUATION WORK")
+        self.drawString(54, 42, "TECHNICAL EVALUATION REPORT — SUBMISSION DOCUMENT")
         self.drawRightString(612 - 54, 42, f"Page {self._pageNumber} of {page_count}")
         self.restoreState()
 
@@ -64,8 +64,8 @@ def create_project_report(output_filename="Project_Report.pdf"):
         'CoverTitle',
         parent=styles['Normal'],
         fontName='Helvetica-Bold',
-        fontSize=28,
-        leading=34,
+        fontSize=26,
+        leading=32,
         textColor=colors.HexColor("#0f172a"),
         alignment=0,
         spaceAfter=15
@@ -75,8 +75,8 @@ def create_project_report(output_filename="Project_Report.pdf"):
         'CoverSubtitle',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=13,
-        leading=18,
+        fontSize=12,
+        leading=16,
         textColor=colors.HexColor("#0891b2"),
         alignment=0,
         spaceAfter=40
@@ -86,11 +86,11 @@ def create_project_report(output_filename="Project_Report.pdf"):
         'Heading1_Custom',
         parent=styles['Heading1'],
         fontName='Helvetica-Bold',
-        fontSize=18,
-        leading=22,
+        fontSize=16,
+        leading=20,
         textColor=colors.HexColor("#0f172a"),
-        spaceBefore=20,
-        spaceAfter=12,
+        spaceBefore=18,
+        spaceAfter=10,
         keepWithNext=True
     )
     
@@ -98,11 +98,11 @@ def create_project_report(output_filename="Project_Report.pdf"):
         'Heading2_Custom',
         parent=styles['Heading2'],
         fontName='Helvetica-Bold',
-        fontSize=12,
-        leading=16,
+        fontSize=11,
+        leading=15,
         textColor=colors.HexColor("#0891b2"),
-        spaceBefore=14,
-        spaceAfter=8,
+        spaceBefore=12,
+        spaceAfter=6,
         keepWithNext=True
     )
     
@@ -110,24 +110,24 @@ def create_project_report(output_filename="Project_Report.pdf"):
         'Body_Custom',
         parent=styles['Normal'],
         fontName='Helvetica',
-        fontSize=10,
-        leading=14.5,
+        fontSize=9.5,
+        leading=14,
         textColor=colors.HexColor("#334155"),
-        spaceAfter=10
+        spaceAfter=8
     )
     
     code_style = ParagraphStyle(
         'Code_Custom',
         parent=styles['Code'],
         fontName='Courier',
-        fontSize=8.5,
-        leading=11,
+        fontSize=8,
+        leading=10,
         textColor=colors.HexColor("#0f172a"),
         backColor=colors.HexColor("#f8fafc"),
         borderColor=colors.HexColor("#e2e8f0"),
         borderWidth=0.5,
         borderPadding=6,
-        spaceAfter=12
+        spaceAfter=10
     )
 
     bullet_style = ParagraphStyle(
@@ -135,24 +135,24 @@ def create_project_report(output_filename="Project_Report.pdf"):
         parent=body_style,
         leftIndent=15,
         firstLineIndent=-10,
-        spaceAfter=6
+        spaceAfter=4
     )
 
     story = []
     
     # ------------------ COVER PAGE ------------------
     story.append(Spacer(1, 100))
-    story.append(Paragraph("AI MEDICAL INTELLIGENCE PLATFORM", title_style))
-    story.append(Paragraph("Production-Grade Chest X-Ray Pneumonia Detection System<br/>incorporating EfficientNetB0, Grad-CAM Explainable AI (XAI), and Gemini LLM reporting.", subtitle_style))
+    story.append(Paragraph("DEVELOPMENT AND DEPLOYMENT OF AN EXPLAINABLE DEEP LEARNING SYSTEM FOR PNEUMONIA SCREENING", title_style))
+    story.append(Paragraph("Technical Report on a Clinical Decision Support System (CDSS) utilizing MobileNetV2 Transfer Learning, Grad-CAM Saliency Mapping, and Automated LLM Reporting.", subtitle_style))
     
     story.append(Spacer(1, 120))
     
     metadata_data = [
-        [Paragraph("<b>Candidate Role:</b>", body_style), Paragraph("Senior AI/ML & Full-Stack Engineer", body_style)],
-        [Paragraph("<b>Target Domain:</b>", body_style), Paragraph("Digital Health & Intelligent Radiology Diagnostics", body_style)],
-        [Paragraph("<b>Core Stack:</b>", body_style), Paragraph("FastAPI, React, TypeScript, TensorFlow, SQLAlchemy, SQLite, Docker", body_style)],
-        [Paragraph("<b>Document Version:</b>", body_style), Paragraph("1.0.0 (Production Release)", body_style)],
-        [Paragraph("<b>Submission Date:</b>", body_style), Paragraph("July 22, 2026", body_style)]
+        [Paragraph("<b>Submitted By:</b>", body_style), Paragraph("Sathya S", body_style)],
+        [Paragraph("<b>GitHub Repository:</b>", body_style), Paragraph("github.com/SathyaS24/AI-Medical-Intelligence-Platform", body_style)],
+        [Paragraph("<b>Live Application URL:</b>", body_style), Paragraph("ai-medical-intelligence-platform-fjeb.onrender.com", body_style)],
+        [Paragraph("<b>Core Stack:</b>", body_style), Paragraph("FastAPI, React, TypeScript, TensorFlow/Keras, SQLite, Docker, Render", body_style)],
+        [Paragraph("<b>Submission Date:</b>", body_style), Paragraph("July 27, 2026", body_style)]
     ]
     metadata_table = Table(metadata_data, colWidths=[1.5*inch, 4.5*inch])
     metadata_table.setStyle(TableStyle([
@@ -164,94 +164,116 @@ def create_project_report(output_filename="Project_Report.pdf"):
     story.append(PageBreak())
     
     # ------------------ SECTION 1 ------------------
-    story.append(Paragraph("1. Executive Summary & Objectives", h1_style))
+    story.append(Paragraph("1. Executive Summary", h1_style))
     story.append(Paragraph(
-        "This project reports on the technical design and architectural execution of the MedTool AI Medical Intelligence Platform. "
-        "The system provides a production-grade, end-to-end intelligent pipeline that accepts frontal chest radiographs, "
-        "performs deep learning classification to identify features associated with active pulmonary pneumonia, generates "
-        "a visual heatmap highlighting diagnostic focal areas using Grad-CAM, and orchestrates Gemini API to generate structured clinical reports.",
+        "Chest radiographs (CXRs) represent the primary imaging modality for diagnosing respiratory infections in pediatric settings. "
+        "However, interpreting pediatric radiographs is complicated by anatomical variations, patient movement, and subjective differences between observers. "
+        "This project reports on the technical implementation of MedTool AI, a clinical decision support system designed to assist radiologists "
+        "by classifying frontal chest radiographs, highlighting focal zones of consolidation using Explainable AI (XAI) overlays, and generating "
+        "structured draft clinical reports utilizing the Google Gemini API.",
         body_style
     ))
-    story.append(Paragraph("Key engineering objectives achieved include:", h2_style))
-    story.append(Paragraph("• <b>Deep Learning Model Excellence:</b> Fine-tuned an EfficientNetB0 network using transfer learning to classify Normal vs. Pneumonia radiographs.", bullet_style))
-    story.append(Paragraph("• <b>Explainable AI (XAI):</b> Developed custom Grad-CAM visualization to highlight specific spatial features that influenced network decisions, satisfying crucial clinical explainability constraints.", bullet_style))
-    story.append(Paragraph("• <b>FastAPI REST Server:</b> Engineered a highly responsive async REST API, exposing endpoints for inference, database logs, and granular status checks.", bullet_style))
-    story.append(Paragraph("• <b>Robust Frontend UI:</b> Built an interactive React dashboard with Vite and TypeScript, featuring a dual-layer cross-fade slider for original/Grad-CAM overlays, historical log inspection, and PDF report downloads.", bullet_style))
+    story.append(Paragraph(
+        "The system integrates a deep learning pipeline (MobileNetV2, fine-tuned on pediatric CXR scans) with a FastAPI backend server and "
+        "an interactive web interface. To bridge the trust gap common in clinical AI tools, the system implements Gradient-weighted Class "
+        "Activation Mapping (Grad-CAM), enabling clinicians to inspect the spatial features that influenced the model's diagnostic classification.",
+        body_style
+    ))
     
     # ------------------ SECTION 2 ------------------
     story.append(Paragraph("2. Dataset & Preprocessing Pipeline", h1_style))
     story.append(Paragraph(
-        "The model is developed on the chest radiograph pneumonia dataset, consisting of anterior-posterior (AP) and posterior-anterior (PA) view X-ray scans of pediatric patients. "
-        "Images are cataloged into NORMAL (no active infiltrates) and PNEUMONIA (visible pulmonary consolidation).",
+        "The classification model was trained and evaluated on pediatric chest radiograph datasets containing anterior-posterior (AP) and posterior-anterior (PA) "
+        "scans. Images are categorized into normal lungs (clear lung fields without active consolidations) and pneumonia (containing visible pulmonary consolidations, "
+        "interstitial patterns, or pleural abnormalities).",
         body_style
     ))
-    story.append(Paragraph("To ensure zero bias and robust evaluation, we implement the following pipeline steps:", h2_style))
-    story.append(Paragraph("1. <b>Strict 70:15:15 Split Strategy:</b> The dataset is partitioned into Training (70%), Validation (15%), and Testing (15%) splits. The test partition is held strictly separate and is never loaded during fitting or callback operations.", bullet_style))
-    story.append(Paragraph("2. <b>Input Matrix Standardization:</b> Images are dynamically loaded, converted to 3-channel RGB, resized to 224x224 pixels, and normalized by dividing color channel values by 255.0 to map input pixel scalars to a [0.0, 1.0] float range.", bullet_style))
-    story.append(Paragraph("3. <b>Online Augmentation:</b> During training, images are randomly subjected to horizontal flips and slight intensity adjustments to build structural invariance.", bullet_style))
+    story.append(Paragraph(
+        "To ensure robust evaluation and prevent data leakage, we implemented a strict 70:15:15 data partitioning strategy. "
+        "The held-out testing partition is stored in a separate directory structure and is never exposed to the model during training or parameter optimization. "
+        "A key challenge in multi-center radiograph analysis is the variation in exposure, contrast, and quality across imaging hardware. "
+        "To address this, we integrated Contrast Limited Adaptive Histogram Equalization (CLAHE) into the preprocessing pipeline. "
+        "CLAHE standardizes the contrast profiles of the lung fields, highlighting subtle consolidations while avoiding the amplification of background noise in soft tissues.",
+        body_style
+    ))
+    story.append(Paragraph(
+        "Input matrices are standardized as follows: image files are parsed, converted to 3-channel matrices, resized to 224x224 pixels, "
+        "subjected to CLAHE contrast normalization, and normalized to floating-point values in the range [0.0, 1.0]. During local training, "
+        "we apply online data augmentation—including random rotations, zooms, and horizontal flips—to improve the model's generalization.",
+        body_style
+    ))
 
     # ------------------ SECTION 3 ------------------
-    story.append(Paragraph("3. Deep Learning Model Architecture", h1_style))
+    story.append(Paragraph("3. Convolutional Neural Network Architecture", h1_style))
     story.append(Paragraph(
-        "We implement <b>EfficientNetB0</b> as the primary classifier. It uses compound scaling to balance depth, width, and resolution, yielding superior feature representation with minimal model parameters. "
-        "The architecture begins with pre-trained ImageNet weights, freezing the convolutional base during initial cycles. "
-        "A customized classification head is appended:",
+        "We selected the MobileNetV2 architecture as the core convolutional neural network. MobileNetV2 utilizes depthwise separable convolutions "
+        "to dramatically reduce the number of parameters and computational complexity, making it ideal for clinical edge servers without dedicated GPUs. "
+        "The base model is initialized with weights pre-trained on ImageNet. During the initial training phase, the convolutional base is frozen to retain "
+        "general edge-detection features, and a customized classification head is appended to learn chest radiograph patterns:",
         body_style
     ))
     story.append(Paragraph(
-        "<i>Input (224x224x3) → EfficientNetB0 Base → GlobalAveragePooling2D → Dense (128, ReLU) → Dropout (0.3) → Dense (1, Sigmoid)</i>",
+        "<i>Input Tensor (224x224x3) → MobileNetV2 Base → GlobalAveragePooling2D → Dense (128, ReLU) → Dropout (40%) → Dense (1, Sigmoid)</i>",
         code_style
     ))
     story.append(Paragraph(
-        "<b>Model Versioning & Version Control:</b> The training script outputs the optimized weights as <code>best_model.keras</code> alongside a structured <code>model_metadata.json</code>. "
-        "This JSON files acts as a version-control log, tracking metrics (accuracy, recall, precision, F1), training timestamps, hyperparameters, and dataset parameters. "
-        "<b>In-Memory Caching:</b> The FastAPI server imports the model once during lifespan startup. The cached model is held in memory and shared across requests, preventing redundant disk loads.",
+        "To address class distribution skew in the training set, we compute and apply inverse-frequency class weights during optimization, "
+        "preventing the loss function from biasing toward the majority class. The final model is saved as a native Keras `.keras` checkpoint, "
+        "accompanied by a metadata JSON file tracking its validation history, hyperparameters, input parameters, and performance metrics (accuracy, loss, sensitivity). "
+        "FastAPI loads this model in-memory during application startup, holding the weights cached to guarantee sub-second API response times.",
         body_style
     ))
     
     story.append(PageBreak())
 
     # ------------------ SECTION 4 ------------------
-    story.append(Paragraph("4. Explainable AI (Grad-CAM)", h1_style))
+    story.append(Paragraph("4. Explainable AI (Grad-CAM) Implementation", h1_style))
     story.append(Paragraph(
-        "Medical AI systems require auditability. We implement <b>Gradient-weighted Class Activation Mapping (Grad-CAM)</b>. "
-        "Grad-CAM uses the gradients of the target class score flowing into the final convolutional layer of the network "
-        "(<code>top_activation</code> in EfficientNetB0) to produce a coarse localization map highlighting the regions in the image most relevant for prediction.",
+        "Clinical adoption of deep learning tools depends heavily on transparency. To resolve the 'black-box' nature of neural networks, we "
+        "implemented Gradient-weighted Class Activation Mapping (Grad-CAM). Grad-CAM tracks the gradients of the diagnostic output score "
+        "with respect to the feature map activations of the final convolutional layer (`out_relu` in MobileNetV2). This highlights the spatial regions "
+        "in the radiograph that most heavily influenced the network's prediction.",
         body_style
     ))
     story.append(Paragraph("The mathematical process is structured as follows:", h2_style))
-    story.append(Paragraph("1. Extract the feature map activations \(A^k\) of the final conv layer and compute gradients of the class output score \(y^c\) with respect to the activations.", bullet_style))
-    story.append(Paragraph("2. Compute the channel-wise importance weights: \(\alpha_k^c = \\frac{1}{Z} \sum_{i} \sum_{j} \\frac{\partial y^c}{\partial A_{i,j}^k}\).", bullet_style))
-    story.append(Paragraph("3. Generate the heatmap via a weighted combination of feature maps filtered through a ReLU activation: \(L_{Grad-CAM}^c = ReLU(\sum_{k} \alpha_k^c A^k)\).", bullet_style))
-    story.append(Paragraph("4. Resize the heatmap to the original image dimensions, normalize, and overlay using a JET colormap blend.", bullet_style))
+    story.append(Paragraph("• <b>Activation Extraction:</b> Extract the convolutional feature maps \(A^k\) and calculate the gradient of the class score \(y^c\) with respect to the activations \(\frac{\partial y^c}{\partial A^k}\).", bullet_style))
+    story.append(Paragraph("• <b>Global Average Pooling:</b> Compute the channel-wise importance weights: \(\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{i,j}^k}\).", bullet_style))
+    story.append(Paragraph("• <b>Linear Combination & ReLU:</b> Aggregate the maps and apply a ReLU filter to ignore negative gradients, keeping only features that positively correlate with the target class: \(L_{Grad-CAM}^c = ReLU(\sum_{k} \alpha_k^c A^k)\).", bullet_style))
+    story.append(Paragraph("• <b>Overlay Generation:</b> Resize the heatmap to the original image dimensions, normalize, and overlay it using a JET colormap blend.", bullet_style))
 
     # ------------------ SECTION 5 ------------------
-    story.append(Paragraph("5. LLM Clinical Reporting & Fallback", h1_style))
+    story.append(Paragraph("5. LLM Integration & Deterministic Fallbacks", h1_style))
     story.append(Paragraph(
-        "To compile findings into actionable clinical reports, the API hooks into the <b>Gemini API</b> (<code>gemini-1.5-flash</code>) using structured JSON prompts. "
-        "If the API key is not configured, or if rate limits block the request, the backend automatically transitions to a "
-        "<b>deterministic local report generator</b>. This generator utilizes pre-defined clinical templates based on the predicted class "
-        "and confidence score, guaranteeing full pipeline reliability without breaking.",
+        "To assist clinicians with documentation, the platform connects to the Google Gemini API (`gemini-1.5-flash`) using structured JSON prompting. "
+        "The model parses the diagnostic output and confidence intervals to draft a clinical report outlining findings, suspected pathologies, and "
+        "recommended follow-up actions. "
+        "To guarantee high reliability in environments with strict firewalls or API rate limits, we built a deterministic local fallback report generator. "
+        "If the connection fails, the backend immediately transitions to generating reports from structured medical templates, ensuring the system remains fully functional.",
         body_style
     ))
-    story.append(Paragraph("<b>Confidence Threshold Constraint:</b> The application supports a configurable confidence threshold (default 70%). If a prediction falls below this setting, the report is annotated with a warning flagging it as a 'Low Confidence Prediction' and advising immediate physician verification.", body_style))
+    story.append(Paragraph(
+        "The system also enforces a configurable confidence threshold (default 70%). If a prediction falls below this threshold, the API flags the result "
+        "with a warning label ('Low Confidence Prediction') in both the user interface and the exported PDFs, indicating that immediate clinician review is required.",
+        body_style
+    ))
 
     # ------------------ SECTION 6 ------------------
     story.append(Paragraph("6. REST API Design & Database Schema", h1_style))
     story.append(Paragraph(
-        "The backend is developed with <b>FastAPI</b>, offering asynchronous non-blocking routes and auto-generated Swagger UI (<code>/docs</code>) and ReDoc (<code>/redoc</code>). "
-        "Heavy operations (predict, Grad-CAM, report formatting) are offloaded to Python's background threadpools to avoid blocking the event loop.",
+        "The backend application is developed using FastAPI. FastAPI provides an asynchronous event loop that allows non-blocking operations. "
+        "Heavy operations (image decoding, model inference, and Grad-CAM matrix math) are offloaded to separate background threads to prevent "
+        "blocking incoming requests. The API includes automatically documented Swagger UI (`/docs`) and ReDoc (`/redoc`) endpoints.",
         body_style
     ))
     
     # API table
     api_data = [
         ["Method", "Endpoint", "Description", "Status Codes"],
-        ["POST", "/predict", "Validate upload size/type, run inference, generate Grad-CAM, generate report, log to DB", "201 Created, 400 Bad Input, 503 Unavailable"],
-        ["GET", "/history", "Query SQLite prediction records (supports search & sorting)", "200 OK, 500 DB Error"],
-        ["GET", "/history/{id}", "Fetch complete prediction and report details", "200 OK, 404 Not Found"],
-        ["DELETE", "/history/{id}", "Delete prediction record and purge images from filesystem", "204 No Content, 404 Not Found"],
-        ["GET", "/health", "System health report (DB connection, model cache status, LLM availability)", "200 OK"]
+        ["POST", "/predict", "Validate and process upload, run inference, generate Grad-CAM and PDF, log to DB", "201, 400, 503"],
+        ["GET", "/history", "Query SQLite prediction records (supports search and sorting)", "200, 500"],
+        ["GET", "/history/{id}", "Fetch complete prediction and clinical report details", "200, 404"],
+        ["DELETE", "/history/{id}", "Delete prediction record and purge images from filesystem", "204, 404"],
+        ["GET", "/health", "System health report (DB connection and model cache status)", "200"]
     ]
     api_table = Table(api_data, colWidths=[1.0*inch, 1.3*inch, 2.5*inch, 1.2*inch])
     api_table.setStyle(TableStyle([
@@ -266,53 +288,46 @@ def create_project_report(output_filename="Project_Report.pdf"):
     ]))
     story.append(api_table)
     story.append(Spacer(1, 10))
-    
-    story.append(Paragraph("<b>Database Abstraction:</b> We use SQLAlchemy ORM. The default database is SQLite for easy evaluation. However, the database layer is written database-agnostically, allowing quick PostgreSQL integration via environment variable swaps.", body_style))
+    story.append(Paragraph("We use SQLAlchemy ORM to manage database logs. By default, the service uses an SQLite backend for easy evaluation. However, the database connection is abstracted, allowing a seamless switch to PostgreSQL by changing the database connection string environment variable.", body_style))
 
     story.append(PageBreak())
 
     # ------------------ SECTION 7 ------------------
-    story.append(Paragraph("7. Frontend UI Design", h1_style))
+    story.append(Paragraph("7. Frontend UI Implementation", h1_style))
     story.append(Paragraph(
-        "The frontend is constructed using <b>React (Vite + TypeScript + Material UI)</b>. "
-        "The user experience is prioritized, featuring glassmorphic designs, micro-animations, and loading progress state indicators. "
-        "Key pages include:",
+        "The client-side dashboard is built with React 19, TypeScript, and Vite. The user interface prioritizes utility and responsiveness, "
+        "offering a clinical dashboard, a dedicated history view, and a workspaces area for analysis. "
+        "Key interface components include:",
         body_style
     ))
-    story.append(Paragraph("• <b>Dashboard:</b> Renders aggregated metrics (total scans, diagnostic ratios, average confidence) fetched dynamically from the database.", bullet_style))
-    story.append(Paragraph("• <b>Analyze (Upload Workspace):</b> Implements client-side checks (JPG/PNG only, <10MB), file drops, and progress spinners.", bullet_style))
-    story.append(Paragraph("• <b>Interactive Grad-CAM Slider:</b> A double-layer image visualizer with a smooth slider overlay. Users can cross-fade between the anatomical X-ray structures and the model activation centers.", bullet_style))
-    story.append(Paragraph("• <b>Report & PDF Export:</b> Renders structured clinical summaries and supports client-side PDF downloads utilizing jsPDF.", bullet_style))
+    story.append(Paragraph("• <b>Clinical Dashboard:</b> Renders aggregated metrics (total scans, diagnostic ratios, average confidence) fetched dynamically from the database API.", bullet_style))
+    story.append(Paragraph("• <b>Workspaces:</b> Implements drag-and-drop file uploaders, client-side validation (file size limit and formats), and live progress indicators.", bullet_style))
+    story.append(Paragraph("• <b>Interactive Grad-CAM Slider:</b> A double-layer image visualizer with a cross-fade slider. Clinicians can adjust the slider to smoothly transition between the raw anatomical X-ray structures and the model activation heatmaps.", bullet_style))
+    story.append(Paragraph("• <b>Report & PDF Export:</b> Renders structured clinical summaries and supports direct client-side PDF downloads utilizing jsPDF.", bullet_style))
 
     # ------------------ SECTION 8 ------------------
     story.append(Paragraph("8. Deployment & Containerization", h1_style))
     story.append(Paragraph(
-        "For production hosting, we provide a multi-stage <code>Dockerfile</code> and <code>docker-compose.yml</code>. "
-        "The multi-stage build compile the React assets using Node, copies them directly to the Python runtime, and mounts "
-        "them as static files served by FastAPI. This results in a single, high-performance container that starts "
-        "without manual configuration.",
-        body_style
-    ))
-    story.append(Paragraph(
-        "The container incorporates a <b>Docker Health Check</b> that queries the FastAPI <code>/api/health</code> endpoint. "
-        "Persistent data volumes are mapped for SQLite database logging, uploaded original X-rays, Grad-CAM results, "
-        "and rotating application logs (stored in <code>logs/application.log</code>).",
+        "For hosting, we configured a multi-stage Dockerfile and docker-compose.yml. "
+        "The builder stage utilizes Node 20 to compile the React static assets, which are copied directly into the Python 3.10-slim runtime container. "
+        "This design aggregates both backend routes and frontend static files under a single port (8000), making deployment clean and simple. "
+        "The container is configured with health checks targeting the `/api/health` endpoint, and volumes are mapped to persist uploaded assets, databases, and application logs.",
         body_style
     ))
 
     # ------------------ SECTION 9 ------------------
-    story.append(Paragraph("9. System Limitations & Future Work", h1_style))
+    story.append(Paragraph("9. Limitations & Future Work", h1_style))
     story.append(Paragraph(
-        "<b>Limitations:</b> Currently, the platform relies on binary chest X-ray classification. In clinical practice, patient presentation is often complex, involving co-occurring pathologies (e.g. pleural effusion, atelectasis, cardiomegaly).",
+        "<b>Limitations:</b> Currently, the classifier handles binary normal-vs-pneumonia screening. In real clinical scenarios, pediatric patients often present with multiple co-occurring pathologies (e.g., pleural effusion, atelectasis, cardiomegaly).",
         body_style
     ))
-    story.append(Paragraph("<b>Future Enhancements:</b>", h2_style))
-    story.append(Paragraph("1. <b>Multi-Label Classification:</b> Transition the EfficientNetB0 classifier to a multi-label classification head using sigmoid activations across 14 target classes.", bullet_style))
-    story.append(Paragraph("2. <b>Saliency Mapping Comparison:</b> Integrate secondary explainability models (Integrated Gradients or LIME) to complement Grad-CAM.", bullet_style))
-    story.append(Paragraph("3. <b>PACS / DICOM Support:</b> Integrate Orthanc DICOM server connectivity to let clinicians query scans directly from their picture archiving and communication systems.", bullet_style))
+    story.append(Paragraph("<b>Future Work:</b>", h2_style))
+    story.append(Paragraph("• <b>Multi-Label Classification:</b> Transition the model to a multi-label classification head using sigmoid activations across 14 target classes.", bullet_style))
+    story.append(Paragraph("• <b>Comparative Saliency Mapping:</b> Integrate secondary explainability models (like Integrated Gradients or LIME) to complement Grad-CAM.", bullet_style))
+    story.append(Paragraph("• <b>PACS Connectivity:</b> Implement DICOM routing to allow the application to query and retrieve scans directly from clinical Picture Archiving and Communication Systems (PACS).", bullet_style))
 
-    # ------------------ CONCLUSION ------------------
-    story.append(Spacer(1, 20))
+    # ------------------ SECTION 10 ------------------
+    story.append(Spacer(1, 10))
     story.append(Paragraph("10. Conclusion & Legal Disclaimer", h1_style))
     story.append(Paragraph(
         "The MedTool AI Medical Intelligence Platform demonstrates a complete, production-ready full-stack software system. "
