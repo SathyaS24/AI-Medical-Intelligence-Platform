@@ -138,6 +138,33 @@ def create_project_report(output_filename="Project_Report.pdf"):
         spaceAfter=4
     )
 
+    # Styles specifically for table cell auto-wrapping
+    table_hdr_style = ParagraphStyle(
+        'TableHdr',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        textColor=colors.white
+    )
+    
+    table_cell_style = ParagraphStyle(
+        'TableCell',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8,
+        leading=10.5,
+        textColor=colors.HexColor("#334155")
+    )
+    
+    table_code_style = ParagraphStyle(
+        'TableCode',
+        parent=styles['Normal'],
+        fontName='Courier-Bold',
+        fontSize=8,
+        leading=10,
+        textColor=colors.HexColor("#0f172a")
+    )
+
     story = []
     
     # ------------------ COVER PAGE ------------------
@@ -236,10 +263,10 @@ def create_project_report(output_filename="Project_Report.pdf"):
         body_style
     ))
     story.append(Paragraph("The mathematical process is structured as follows:", h2_style))
-    story.append(Paragraph("• <b>Activation Extraction:</b> Extract the convolutional feature maps \(A^k\) and calculate the gradient of the class score \(y^c\) with respect to the activations \(\frac{\partial y^c}{\partial A^k}\).", bullet_style))
-    story.append(Paragraph("• <b>Global Average Pooling:</b> Compute the channel-wise importance weights: \(\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{i,j}^k}\).", bullet_style))
-    story.append(Paragraph("• <b>Linear Combination & ReLU:</b> Aggregate the maps and apply a ReLU filter to ignore negative gradients, keeping only features that positively correlate with the target class: \(L_{Grad-CAM}^c = ReLU(\sum_{k} \alpha_k^c A^k)\).", bullet_style))
-    story.append(Paragraph("• <b>Overlay Generation:</b> Resize the heatmap to the original image dimensions, normalize, and overlay it using a JET colormap blend.", bullet_style))
+    story.append(Paragraph("• <b>Feature Map Activation:</b> Extract the activation maps <i>A<sup>k</sup></i> of the final convolutional layer, and calculate the gradient of the class score <i>y<sup>c</sup></i> with respect to the activations, denoted as <i>&part;y<sup>c</sup> / &part;A<sup>k</sup></i>.", bullet_style))
+    story.append(Paragraph("• <b>Channel-Wise Importance:</b> Compute the importance weights by average-pooling the gradients over the spatial dimensions: <i>&alpha;<sub>k</sub><sup>c</sup> = (1 / Z) * &Sigma;<sub>i</sub> &Sigma;<sub>j</sub> (&part;y<sup>c</sup> / &part;A<sub>i,j</sub><sup>k</sup>)</i>.", bullet_style))
+    story.append(Paragraph("• <b>Rectified Linear Combination:</b> Perform a weighted summation of feature maps and filter through a ReLU activation to focus only on features that positively contribute to the class: <i>L<sub>Grad-CAM</sub> = ReLU(&Sigma;<sub>k</sub> &alpha;<sub>k</sub><sup>c</sup> A<sup>k</sup>)</i>.", bullet_style))
+    story.append(Paragraph("• <b>Heatmap Synthesis:</b> Bilinearly interpolate the resulting activation map to match the input scan dimensions and blend using a JET colormap overlay.", bullet_style))
 
     # ------------------ SECTION 5 ------------------
     story.append(Paragraph("5. LLM Integration & Deterministic Fallbacks", h1_style))
@@ -266,25 +293,52 @@ def create_project_report(output_filename="Project_Report.pdf"):
         body_style
     ))
     
-    # API table
+    # API table with auto-wrapping Paragraph elements in each cell
     api_data = [
-        ["Method", "Endpoint", "Description", "Status Codes"],
-        ["POST", "/predict", "Validate and process upload, run inference, generate Grad-CAM and PDF, log to DB", "201, 400, 503"],
-        ["GET", "/history", "Query SQLite prediction records (supports search and sorting)", "200, 500"],
-        ["GET", "/history/{id}", "Fetch complete prediction and clinical report details", "200, 404"],
-        ["DELETE", "/history/{id}", "Delete prediction record and purge images from filesystem", "204, 404"],
-        ["GET", "/health", "System health report (DB connection and model cache status)", "200"]
+        [
+            Paragraph("Method", table_hdr_style), 
+            Paragraph("Endpoint", table_hdr_style), 
+            Paragraph("Description", table_hdr_style), 
+            Paragraph("Status Codes", table_hdr_style)
+        ],
+        [
+            Paragraph("POST", table_cell_style), 
+            Paragraph("/api/predict", table_code_style), 
+            Paragraph("Validate and process upload, run inference, generate Grad-CAM and PDF, log to DB", table_cell_style), 
+            Paragraph("201, 400, 503", table_cell_style)
+        ],
+        [
+            Paragraph("GET", table_cell_style), 
+            Paragraph("/api/history", table_code_style), 
+            Paragraph("Query SQLite prediction records (supports search and sorting)", table_cell_style), 
+            Paragraph("200, 500", table_cell_style)
+        ],
+        [
+            Paragraph("GET", table_cell_style), 
+            Paragraph("/api/history/{id}", table_code_style), 
+            Paragraph("Fetch complete prediction and clinical report details", table_cell_style), 
+            Paragraph("200, 404", table_cell_style)
+        ],
+        [
+            Paragraph("DELETE", table_cell_style), 
+            Paragraph("/api/history/{id}", table_code_style), 
+            Paragraph("Delete prediction record and purge images from filesystem", table_cell_style), 
+            Paragraph("204, 404", table_cell_style)
+        ],
+        [
+            Paragraph("GET", table_cell_style), 
+            Paragraph("/api/health", table_code_style), 
+            Paragraph("System health report (DB connection and model cache status)", table_cell_style), 
+            Paragraph("200", table_cell_style)
+        ]
     ]
-    api_table = Table(api_data, colWidths=[1.0*inch, 1.3*inch, 2.5*inch, 1.2*inch])
+    api_table = Table(api_data, colWidths=[0.8*inch, 1.4*inch, 2.8*inch, 1.0*inch])
     api_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#1e293b")),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,-1), 8),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#e2e8f0")),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-        ('TOPPADDING', (0,0), (-1,-1), 5),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(api_table)
     story.append(Spacer(1, 10))
