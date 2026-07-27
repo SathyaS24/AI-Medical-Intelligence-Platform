@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  medical-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist SQLite database
+      - db_data:/app/backend/database
+      # Persist uploaded original files and Grad-CAM results
+      - uploads_data:/app/backend/static
+      # Persist application logs
+      - logs_data:/app/logs
+    restart: always
+
+volumes:
+  db_data:
+  uploads_data:
+  logs_data:
