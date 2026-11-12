@@ -6,15 +6,40 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
-from backend.config import FRONTEND_URL, MODEL_PATH, STATIC_DIR, HOST, PORT, METADATA_PATH, PROJECT_ROOT
+from backend.config import (
+    FRONTEND_URL, MODEL_PATH, STATIC_DIR, HOST, PORT,
+    METADATA_PATH, PROJECT_ROOT, CONFIDENCE_THRESHOLD, GEMINI_API_KEY, DATABASE_URL
+)
 from backend.database.connection import engine, Base
 from backend.api.routes import router
 from backend.utils.logger import logger
 
+class SPAStaticFiles(StaticFiles):
+    """Custom static files handler that serves index.html for client-side SPA routing."""
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if response.status_code == 404:
+            return await super().get_response("index.html", scope)
+        return response
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # --- Startup ---
-    logger.info("Application starting up...")
+    logger.info("==================================================")
+    logger.info("AI Medical Intelligence Platform (MedTool) Starting")
+    logger.info(f"Target Server Binding: {HOST}:{PORT}")
+    logger.info(f"Confidence Threshold: {CONFIDENCE_THRESHOLD * 100:.1f}%")
+    safe_db = DATABASE_URL.split("@")[-1] if "@" in DATABASE_URL else DATABASE_URL
+    logger.info(f"Active Database: {safe_db}")
+    
+    if GEMINI_API_KEY:
+        logger.info("Gemini LLM API configured for clinical report generation.")
+    else:
+        logger.warning(
+            "GEMINI_API_KEY is not configured. "
+            "Platform will use deterministic local clinical report generator as default fallback."
+        )
+    logger.info("==================================================")
     
     # 1. Initialize Database Tables
     try:
@@ -71,21 +96,34 @@ app = FastAPI(
 
 # CORS Configuration
 # Standard CORS middleware enabling cross-origin requests from the React frontend
-origins = [
-    FRONTEND_URL,
-    "http://localhost:5173",  # fallback local Vite port
-    "http://127.0.0.1:5173",  # 127.0.0.1 loopback Vite port
+parsed_origins = [o.strip() for o in FRONTEND_URL.split(",") if o.strip()]
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
 ]
+origins = list(dict.fromkeys(parsed_origins + default_origins))
+allow_all = "*" in parsed_origins or os.getenv("ALLOW_ALL_ORIGINS", "").lower() in ("true", "1")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if allow_all:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Mount Static Directory
 # Used to serve original uploads and Grad-CAM results
@@ -95,10 +133,10 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 # Register API Router
 app.include_router(router, prefix="/api")
 
-# Serve Frontend Static Files (Vite Production Build)
+# Serve Frontend Static Files (Vite Production Build) with SPA fallback
 FRONTEND_DIST_DIR = os.path.join(PROJECT_ROOT, "frontend", "dist")
 if os.path.exists(FRONTEND_DIST_DIR):
-    app.mount("/", StaticFiles(directory=FRONTEND_DIST_DIR, html=True), name="frontend")
+    app.mount("/", SPAStaticFiles(directory=FRONTEND_DIST_DIR, html=True), name="frontend")
 
 # Global Exception Handlers for Robust Error Responses
 @app.exception_handler(Exception)
@@ -111,5 +149,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 if __name__ == "__main__":
     import uvicorn
-    logger.info(f"Running uvicorn server on {HOST}:{PORT}")
-    uvicorn.run("backend.main:app", host=HOST, port=PORT, reload=True)
+    reload_flag = os.getenv("RELOAD", "false").lower() == "true"
+    logger.info(f"Running uvicorn server on {HOST}:{PORT} (reload={reload_flag})")
+    uvicorn.run("backend.main:app", host=HOST, port=PORT, reload=reload_flag)

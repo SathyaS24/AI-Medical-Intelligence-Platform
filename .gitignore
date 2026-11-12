@@ -43,9 +43,16 @@ yarn-error.log*
 
 # Application Specific
 backend/predictions.db
+backend/database/*.db
+backend/database/*.sqlite*
+*.db
+*.sqlite
+*.sqlite3
 backend/uploads/
 backend/static/uploads/
 backend/static/gradcam/
+backend/static/original/
+!backend/static/original/ac937a80-2bc0-43c2-aed8-7eeaae05e5b2.jpeg
 logs/
 .env
 

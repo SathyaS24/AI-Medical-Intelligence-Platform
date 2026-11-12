@@ -193,8 +193,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           {children}
         </Container>
         
-        {/* Footer */}
+        {/* Footer with Clinical Disclaimer */}
         <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto', borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 850, mx: 'auto', mb: 1, lineHeight: 1.5 }}>
+            <strong>Medical Disclaimer:</strong> MedTool AI predictions, Grad-CAM visualizations, and generated clinical summaries are experimental decision-support tools intended exclusively for educational and research evaluation. They do not constitute official clinical diagnoses and must never replace expert medical judgment, direct patient examination, or confirmation by a licensed healthcare professional.
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             © {new Date().getFullYear()} MedTool AI. All rights reserved.
           </Typography>

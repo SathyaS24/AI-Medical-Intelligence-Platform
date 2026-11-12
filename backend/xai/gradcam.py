@@ -51,23 +51,41 @@ def generate_gradcam(model, img_array: np.ndarray, original_img_path: str, outpu
             
         logger.info(f"Using convolutional layer '{conv_layer.name}' for Grad-CAM generation.")
         
-        # Force Keras to build/trace the model nodes by executing a symbolic call on the input tensor
-        _ = model(img_array)
+        # 2. Gradient computation supporting both Sequential (with nested base) and Functional models
+        grads = None
+        conv_outputs = None
         
-        # 2. Set up a sub-model that outputs both the last conv activations and predictions
-        grad_model = tf.keras.models.Model(
-            inputs=model.inputs,
-            outputs=[conv_layer.output, model.output]
-        )
-        
-        # 3. Compute gradients of the predicted class with respect to the activations
-        with tf.GradientTape() as tape:
-            conv_outputs, predictions = grad_model(img_array)
-            # Binary classification: output is sigmoid probability
-            loss = predictions[0]
+        # Branch A: Sequential model with a nested base model (e.g. MobileNetV2/EfficientNet in Keras 3)
+        if isinstance(model, tf.keras.Sequential) and len(model.layers) > 1 and hasattr(model.layers[0], "layers"):
+            base_model = model.layers[0]
+            conv_model = tf.keras.models.Model(inputs=base_model.inputs, outputs=conv_layer.output)
             
-        # Get gradients of the loss with respect to the final conv layer activations
-        grads = tape.gradient(loss, conv_outputs)
+            with tf.GradientTape() as tape:
+                conv_out = conv_model(img_array)
+                tape.watch(conv_out)
+                x = conv_out
+                for layer in model.layers[1:]:
+                    x = layer(x)
+                predictions = x
+                loss = predictions[:, 0]
+                
+            grads = tape.gradient(loss, conv_out)
+            conv_outputs = conv_out
+        else:
+            # Branch B: Standard Functional or flat Sequential model
+            grad_model = tf.keras.models.Model(
+                inputs=model.inputs,
+                outputs=[conv_layer.output, model.output]
+            )
+            with tf.GradientTape() as tape:
+                conv_out, predictions = grad_model(img_array)
+                loss = predictions[:, 0]
+                
+            grads = tape.gradient(loss, conv_out)
+            conv_outputs = conv_out
+            
+        if grads is None or conv_outputs is None:
+            raise ValueError("Failed to compute gradients for Grad-CAM.")
         
         # Compute channel-wise mean of gradients
         # grads shape: (1, H, W, C) -> pooled_grads shape: (C,)
@@ -102,8 +120,10 @@ def generate_gradcam(model, img_array: np.ndarray, original_img_path: str, outpu
         # Using 60% original image and 40% heatmap color representation
         overlay = cv2.addWeighted(orig_img, 0.6, colormap, 0.4, 0)
         
-        # Ensure output directory exists
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        # Ensure output directory exists if path has a directory
+        output_dir = os.path.dirname(output_path)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
         
         # Save overlay image
         cv2.imwrite(output_path, overlay)

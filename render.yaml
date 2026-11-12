@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: ai-medical-intelligence-platform
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: oregon
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.70"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: FRONTEND_URL
+        value: "*"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+    # Optional: If deploying with a Render Paid Plan (Starter+), uncomment this disk block
+    # to persist SQLite database across container restarts.
+    # disk:
+    #   name: medical-storage
+    #   mountPath: /app/backend/database
+    #   sizeGB: 1

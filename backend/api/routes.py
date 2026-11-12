@@ -7,6 +7,7 @@ import uuid
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from datetime import datetime, timezone
 
 from backend.config import UPLOAD_DIR, GRADCAM_DIR, ORIGINAL_DIR, CONFIDENCE_THRESHOLD, GEMINI_API_KEY, METADATA_PATH
@@ -380,7 +381,7 @@ async def health_check(request: Request, db: Session = Depends(get_db)):
     db_connected = False
     try:
         # Run a simple query to verify database connection
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db_connected = True
     except Exception as e:
         logger.critical(f"Health check failed database connectivity: {e}")

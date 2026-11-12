@@ -35,17 +35,21 @@ COPY trained_model/ ./trained_model
 # Copy built frontend assets to be served by FastAPI
 COPY --from=frontend-builder /frontend/dist ./frontend/dist
 
-# Expose backend port
+# Expose default backend port
 EXPOSE 8000
 
-# Set environment variables
-ENV DATABASE_URL=sqlite:///./backend/predictions.db
-ENV PORT=8000
-ENV HOST=0.0.0.0
+# Set default production environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DATABASE_URL=sqlite:///./backend/database/predictions.db \
+    PORT=8000 \
+    HOST=0.0.0.0 \
+    CONFIDENCE_THRESHOLD=0.70 \
+    LOG_LEVEL=INFO
 
-# Health check to ensure API is responsive
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8000/api/health || exit 1
+# Health check dynamically bound to $PORT (supporting both local Docker and Render)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8000}/api/health || exit 1
 
-# Start the application
-CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the application dynamically evaluating Render's assigned $PORT
+CMD ["sh", "-c", "python -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
